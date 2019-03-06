@@ -5,5 +5,5 @@ Prof: Dr. Martinez-Ramon
 Authors: Dimitrios Sikeridis, Lyndon Gesner, Ibiyote Olonisakin, and Panayioti Kitsos  
 Spring 2019  
 
-# Description
+## Description
 This repository contains class assignments for ECE 595: Advanced Machine Learning at the University of New Mexico.
