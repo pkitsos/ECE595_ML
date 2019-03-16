@@ -97,8 +97,10 @@ pi = ones(1, k) * (1 / k);
 % Matrix holds the responsibility probability that each data point 
 % belongs to a cluster (Rows => data points |  Columns => clusters)
 R_ik = zeros(m, k);
-
+keepLn=[];
+Lo=10;
 % Loop until convergence
+
 for (iter = 1:1000)
     
     fprintf('EM Iteration %d\n', iter);
@@ -160,11 +162,23 @@ for (iter = 1:1000)
         sigma{j} = sigma_k ./ sum(R_ik(:, j));
     end
     
+    k=3;
+    W=pi;
+    M=mu';
+    V=sigma;
+    Ln = Likelihood(X,k,W,M,V);
+    keepLn=[keepLn Ln];
+
     % Check for convergence when computed mean no longer changes
-    if (mu == prevMu)
+%     if (mu == prevMu)
+%         break
+%     end
+    
+    % Check for convergence when computed mean no longer changes
+    if (abs(Lo-Ln)<0.001)
         break
     end
- 
+     Lo = Ln;
     %% Represent mixture model
     
     % Calculate the Gaussian response for every value in the grid
@@ -176,6 +190,7 @@ for (iter = 1:1000)
     % Plot the data and estimated pdfs for each cluster
     figure(1)
     subplot(1,2,1); 
+    box on;
     scatter(X1(:,1),X1(:,2),40,'ro', 'filled'); hold on;
     scatter(X2(:,1),X2(:,2),40,'bo', 'filled'); 
     scatter(X3(:,1),X3(:,2),40,'co', 'filled'); 
@@ -208,4 +223,23 @@ for (iter = 1:1000)
     %fprintf(' Mu1: (%d,%d) Mu2: (%d,%d) Mu3: (%d,%d)\n', mu1, mu2, mu3);
 
     % End of Expectation Maximization    
+end
+
+% Ouputs:
+%   W(1,k) - estimated weights of GM
+%   M(d,k) - estimated mean vectors of GM
+%   V(d,d,k) - estimated covariance matrices of GM
+%   L - log likelihood of estimates
+function L = Likelihood(X,k,W,M,V)
+% Compute L based on K. V. Mardia, "Multivariate Analysis", Academic Press, 1979, PP. 96-97
+% to enchance computational speed
+[n,d] = size(X);
+U = mean(X)';
+S = cov(X);
+L = 0;
+for i=1:k,
+    iV = V{i};
+    L = L + W(i)*(-0.5*n*log(det(2*pi*V{i})) ...
+        -0.5*(n-1)*(trace(iV*S)+(U-M(:,i))'*iV*(U-M(:,i))));
+end
 end
