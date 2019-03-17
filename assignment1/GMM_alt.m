@@ -188,8 +188,7 @@ for (iter = 1:1000)
     Z = [z1;z2;z3];
 
     % Plot the data and estimated pdfs for each cluster
-    figure(1)
-    subplot(1,2,1); 
+    figure(1) 
     box on;
     scatter(X1(:,1),X1(:,2),40,'ro', 'filled'); hold on;
     scatter(X2(:,1),X2(:,2),40,'bo', 'filled'); 
@@ -208,7 +207,7 @@ for (iter = 1:1000)
 
 
     % Plot 3D PDF
-    subplot(1,2,2); 
+    figure(2); 
     surf(x,y,buffer(z1,sqrt(length(z1)),0),opts); hold on;
     surf(x,y,buffer(z2,sqrt(length(z2)),0),opts);
     surf(x,y,buffer(z3,sqrt(length(z3)),0),opts); hold off;
@@ -218,7 +217,7 @@ for (iter = 1:1000)
     axis tight; view(-50,30); camlight left;
 
     % Maximize figure to screensize
-    set(gcf, 'Position', get(0,'Screensize'));
+%     set(gcf, 'Position', get(0,'Screensize'));
 
     %fprintf(' Mu1: (%d,%d) Mu2: (%d,%d) Mu3: (%d,%d)\n', mu1, mu2, mu3);
 
