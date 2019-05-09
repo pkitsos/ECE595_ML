@@ -1,5 +1,4 @@
 clear all
-
 %data genration
 x=(-14:14)/29; 
 z1=kron(ones(1,18),x); 
@@ -23,16 +22,25 @@ figure(1)
 
 %FastICA
 V = W^-1;   %Recognition Matrix
+NLL = (zeros(1000))';  %Negaive Log-Likelihood
+conv = (zeros(1000))'; %Convergence check V'V = 1
 
-%update V
+% multiple iterations for observing changes in the negative log-likelihood
+for n=1:1000
+
 for i=1:4
-    V(:,i) = (X * (tanh((V(:,i))' * X)') - ((1 - tanh((V(:,i))' * X).^2) * X')')/4;
+    %Computing NLL
+    NLL(n) = NLL(n) + mean(log(cosh(V(:,i)' * X)));
+    
+    %update V
+    V(:,i) = (X * (tanh((V(:,i))' * X)') - ((1 - tanh((V(:,i))' * X).^2) * X')');
+    
+    %normalize V
+    V(:,i) = normalize(V(:,i));
 
-%force orthogonality
-%ignored
+    %force orthogonality
+    V(:,i) = orth(V(:,i));
 
-%normalize V
-%expectation already implements normalization
 
 end
 
@@ -50,4 +58,27 @@ figure(2)
  subplot(4,1,2); plot(squeeze(z2));
  subplot(4,1,3); plot(squeeze(z3));
  subplot(4,1,4); plot(squeeze(z4));
+ hold off
  
+ %varying V'V = 1 for convergence
+ conv(n) = mean(mean(V' * V));
+ 
+
+
+end 
+
+figure(3)
+hold on
+plot(NLL);
+xlabel('Observations');
+ylabel('NLL');
+title('Evolution of Negative Log-Likelihood');
+hold off
+
+figure(4)
+hold on
+plot(conv);
+xlabel('Observations');
+ylabel('V transpose V = 1');
+title('Convergence of Recognition Matrix');
+hold off
